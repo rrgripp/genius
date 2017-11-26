@@ -12,6 +12,11 @@
         android:title="@string/title_jogar" />
 
     <item
+        android:id="@+id/navigation_high_score"
+        android:icon="@drawable/ic_star_black_24dp"
+        android:title="@string/title_high_score" />
+
+    <item
         android:id="@+id/navigation_ajustes"
         android:icon="@drawable/ic_notifications_black_24dp"
         android:title="@string/title_ajustes" />

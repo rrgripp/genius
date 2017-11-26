@@ -1,19 +1,22 @@
 package unicamp.ruiter.genius;
 
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.net.Uri;
+import android.bluetooth.BluetoothSocket;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity
-        implements HomeFragment.OnFragmentInteractionListener,
-        JogoFragment.OnFragmentInteractionListener, AjustesFragment.OnFragmentInteractionListener {
+import java.io.IOException;
 
+public class MainActivity extends AppCompatActivity {
+
+    private BluetoothAdapter mBluetoothAdapter;
     private BluetoothDevice mDevice;
+    private BluetoothSocket mSocket;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -33,6 +36,13 @@ public class MainActivity extends AppCompatActivity
                     getSupportFragmentManager()
                             .beginTransaction()
                             .replace(R.id.fragment_container, jogoFragment)
+                            .commit();
+                    return true;
+                case R.id.navigation_high_score:
+                    HighScoreFragment highScoreFragment = HighScoreFragment.newInstance();
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, highScoreFragment)
                             .commit();
                     return true;
                 case R.id.navigation_ajustes:
@@ -56,12 +66,35 @@ public class MainActivity extends AppCompatActivity
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-        Log.wtf("LOGGER:", uri.toString());
-    }
-
     public void setDevice(BluetoothDevice device) {
         mDevice = device;
+    }
+
+    public BluetoothAdapter initBluetooth() {
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter == null) {
+            // Device does not support Bluetooth
+        }
+
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, Constants.REQUEST_ENABLE_BT);
+        }
+
+        return mBluetoothAdapter;
+    }
+
+    public void sendBluetooothSerial(String identifier) {
+
+    }
+
+    public void connectThread() {
+        if (mDevice == null) {
+
+        }
+        try {
+            // MY_UUID is the app's UUID string, also used by the server code
+            mSocket = mDevice.createRfcommSocketToServiceRecord(Constants.GENIUS_UUID);
+        } catch (IOException e) { }
     }
 }
