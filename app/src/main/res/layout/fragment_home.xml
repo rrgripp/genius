@@ -1,0 +1,54 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="unicamp.ruiter.genius.HomeFragment">
+
+    <ImageView
+        android:id="@+id/genius"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:src="@drawable/genius" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/genius"
+        android:padding="2dp"
+        android:text="@string/app_name"
+        android:textAlignment="center"
+        android:textColor="@color/colorPrimaryDark"
+        android:fontFamily="casual"
+        android:textSize="20pt"/>
+
+    <TextView
+        android:id="@+id/subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        android:padding="2dp"
+        android:text="@string/subtitle"
+        android:textAlignment="center"
+        android:textColor="@color/darkGray"
+        android:fontFamily="casual"
+        android:textSize="10pt"/>
+
+    <TextView
+        android:id="@+id/signature"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/subtitle"
+        android:padding="2dp"
+        android:text="@string/signature"
+        android:textStyle="italic"
+        android:textAlignment="center"
+        android:textColor="@color/lightGray"
+        android:fontFamily="casual"
+        android:textSize="8pt"/>
+
+
+
+</android.support.constraint.ConstraintLayout>
