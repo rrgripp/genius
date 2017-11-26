@@ -67,7 +67,7 @@ public class AjustesFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mBluetoothAdapter = mActivity.initBluetooth();
+        mBluetoothAdapter = mActivity.initBluetooth((Fragment) this);
 
         mArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
         mDevicesList = (ListView) getView().findViewById(R.id.devices_list);

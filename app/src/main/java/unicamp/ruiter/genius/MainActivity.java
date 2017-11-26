@@ -7,16 +7,23 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class MainActivity extends AppCompatActivity {
 
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothDevice mDevice;
     private BluetoothSocket mSocket;
+    private InputStream mInStream;
+    private OutputStream mOutStream;
+
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -70,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         mDevice = device;
     }
 
-    public BluetoothAdapter initBluetooth() {
+    public BluetoothAdapter initBluetooth(Fragment fragment) {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             // Device does not support Bluetooth
@@ -78,23 +85,75 @@ public class MainActivity extends AppCompatActivity {
 
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, Constants.REQUEST_ENABLE_BT);
+            fragment.startActivityForResult(enableBtIntent, Constants.REQUEST_ENABLE_BT);
         }
 
         return mBluetoothAdapter;
     }
 
     public void sendBluetooothSerial(String identifier) {
-
+        connectThread();
     }
 
     public void connectThread() {
         if (mDevice == null) {
+            Toast.makeText(this, "É preciso conectar ao dispositivo bluetooth primeiro", Toast.LENGTH_SHORT).show();
 
+            AjustesFragment ajustesFragment = AjustesFragment.newInstance();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, ajustesFragment)
+                    .commit();
         }
         try {
             // MY_UUID is the app's UUID string, also used by the server code
             mSocket = mDevice.createRfcommSocketToServiceRecord(Constants.GENIUS_UUID);
+        } catch (IOException e) { }
+    }
+
+    public void connectSocket() {
+        try {
+            // Connect the device through the socket. This will block
+            // until it succeeds or throws an exception
+            mSocket.connect();
+        } catch (IOException connectException) {
+            // Unable to connect; close the socket and get out
+            try {
+                mSocket.close();
+            } catch (IOException closeException) { }
+            return;
+        }
+    }
+
+    public void closeSocket() {
+        try {
+            mSocket.close();
+        } catch (IOException e) { }
+    }
+
+    public void listen() {
+        byte[] buffer = new byte[1024];  // buffer store for the stream
+        int bytes; // bytes returned from read()
+
+        // Keep listening to the InputStream until an exception occurs
+        while (true) {
+            try {
+                // Read from the InputStream
+                bytes = mInStream.read(buffer);
+                // Send the obtained bytes to the UI activity
+                //TODO: setup handler to read received messages
+//                mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
+//                        .sendToTarget();
+            } catch (IOException e) {
+                break;
+            }
+        }
+    }
+
+    /* Call this from the main activity to send data to the remote device */
+    public void write(byte[] bytes) {
+        try {
+            mOutStream.write(bytes);
         } catch (IOException e) { }
     }
 }
