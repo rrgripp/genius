@@ -1,12 +1,17 @@
 package unicamp.ruiter.genius;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 
@@ -85,6 +90,32 @@ public class JogoFragment extends Fragment {
 
         mBlueButton = getActivity().findViewById(R.id.blue_block);
         mBlueButton.setOnClickListener(mClickListener);
+
+        AsyncTask.execute(new Runnable() {
+            String buffer;
+
+            @Override
+            public void run() {
+                buffer = mActivity.listen();
+
+                if (buffer.equals("Y"));
+                final EditText nomeField = new EditText(getContext());
+                nomeField.setInputType(InputType.TYPE_CLASS_TEXT);
+
+                new AlertDialog.Builder(getContext())
+                        .setTitle("Perdeu =(")
+                        .setMessage("Gostaria de salvar o resultado?")
+                        .setView(nomeField)
+                        .setPositiveButton("Salvar", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                mActivity.sendBluetooothSerial(nomeField.getText().toString() + "\r");
+                            }
+                        })
+                        .setNegativeButton("Cancelar", null)
+                        .create().show();
+            }
+        });
     }
 
     @Override

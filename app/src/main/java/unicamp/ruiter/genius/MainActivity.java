@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void listen() {
+    public String listen() {
         byte[] buffer = new byte[1024];  // buffer store for the stream
         int bytes; // bytes returned from read()
 
@@ -174,13 +174,15 @@ public class MainActivity extends AppCompatActivity {
                 // Read from the InputStream
                 bytes = mInStream.read(buffer);
                 // Send the obtained bytes to the UI activity
-                mListener.inputReceived(buffer);
+//                mListener.inputReceived(buffer);
             } catch (IOException e) {
                 e.printStackTrace();
                 Toast.makeText(this, "Não foi possível receber mensagem do dispositivo", Toast.LENGTH_SHORT).show();
                 break;
             }
         }
+
+        return buffer.toString();
     }
 
     /* Call this from the main activity to send data to the remote device */
