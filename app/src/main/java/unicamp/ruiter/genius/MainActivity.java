@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -81,6 +82,10 @@ public class MainActivity extends AppCompatActivity {
         mNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         mNavigationView.setSelectedItemId(R.id.navigation_home);
 
+
+        if (isSocketConnected()) {
+            closeSocket();
+        }
         connectThread();
     }
 
@@ -91,6 +96,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void setDevice(BluetoothDevice device) {
         mDevice = device;
+        if (isSocketConnected()) {
+            closeSocket();
+        }
         connectThread();
     }
 
@@ -109,9 +117,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void sendBluetooothSerial(String text) {
-        if (mSocket != null && mSocket.isConnected()) {
+        if (isSocketConnected()) {
             write(text.getBytes(Charset.forName("UTF-8")));
         }
+    }
+
+    private boolean isSocketConnected() {
+        return mSocket != null && mSocket.isConnected();
     }
 
     public void connectThread() {
@@ -166,6 +178,8 @@ public class MainActivity extends AppCompatActivity {
 
     public String listen() {
         byte[] buffer = new byte[1024];  // buffer store for the stream
+        byte[] finalBuffer = new byte[1024];
+        int bufferPointer = 0;
         int bytes; // bytes returned from read()
 
         // Keep listening to the InputStream until an exception occurs
@@ -174,7 +188,15 @@ public class MainActivity extends AppCompatActivity {
                 // Read from the InputStream
                 bytes = mInStream.read(buffer);
                 // Send the obtained bytes to the UI activity
-//                mListener.inputReceived(buffer);
+                Log.d(Constants.TAG, new String(buffer).substring(0, bytes));
+                if (new String(buffer).contains("%")) {
+                    mListener.inputReceived(new String(finalBuffer).substring(0, bufferPointer));
+                } else {
+                    for (int i = 0; i < bytes; i++) {
+                        finalBuffer[bufferPointer + i] = buffer[i];
+                    }
+                    bufferPointer += bytes;
+                }
             } catch (IOException e) {
                 e.printStackTrace();
                 Toast.makeText(this, "Não foi possível receber mensagem do dispositivo", Toast.LENGTH_SHORT).show();
@@ -182,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        return buffer.toString();
+        return new String(buffer);
     }
 
     /* Call this from the main activity to send data to the remote device */
@@ -196,6 +218,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public interface OnReceiveInputStream {
-        void inputReceived(byte[] bytes);
+        void inputReceived(String bytes);
     }
 }
