@@ -5,7 +5,9 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +21,7 @@ import java.nio.charset.Charset;
 
 public class MainActivity extends AppCompatActivity {
 
+    private BottomNavigationView mNavigationView;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothDevice mDevice;
     private BluetoothSocket mSocket;
@@ -41,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
                             .commit();
                     return true;
                 case R.id.navigation_jogar:
+                    sendBluetooothSerial("P");
                     JogoFragment jogoFragment = JogoFragment.newInstance();
                     getSupportFragmentManager()
                             .beginTransaction()
@@ -48,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
                             .commit();
                     return true;
                 case R.id.navigation_high_score:
+                    sendBluetooothSerial("S");
                     HighScoreFragment highScoreFragment = HighScoreFragment.newInstance();
                     getSupportFragmentManager()
                             .beginTransaction()
@@ -72,8 +77,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        mNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
+        mNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        mNavigationView.setSelectedItemId(R.id.navigation_home);
+
+        connectThread();
+    }
+
+    @Override
+    public void onPostCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+        super.onPostCreate(savedInstanceState, persistentState);
     }
 
     public void setDevice(BluetoothDevice device) {
@@ -96,20 +109,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void sendBluetooothSerial(String text) {
-        if (mSocket.isConnected()) {
+        if (mSocket != null && mSocket.isConnected()) {
             write(text.getBytes(Charset.forName("UTF-8")));
         }
     }
 
     public void connectThread() {
         if (mDevice == null) {
-            Toast.makeText(this, "É preciso conectar ao dispositivo bluetooth primeiro", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "É preciso conectar ao dispositivo Bluetooth primeiro em Ajustes", Toast.LENGTH_SHORT).show();
 
-            AjustesFragment ajustesFragment = AjustesFragment.newInstance();
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, ajustesFragment)
-                    .commit();
+            return;
         }
 
         try {
@@ -127,6 +136,16 @@ public class MainActivity extends AppCompatActivity {
             // Connect the device through the socket. This will block
             // until it succeeds or throws an exception
             mSocket.connect();
+
+            // Get the input and output streams, using temp objects because
+            // member streams are final
+            try {
+                mInStream = mSocket.getInputStream();
+                mOutStream = mSocket.getOutputStream();
+            } catch (IOException stremException) { }
+
+            Toast.makeText(this, "Conectado com o dispositivo", Toast.LENGTH_SHORT).show();
+
         } catch (IOException connectException) {
             connectException.printStackTrace();
             Toast.makeText(this, "Não foi possível iniciar a conexao com o dispositivo", Toast.LENGTH_SHORT).show();

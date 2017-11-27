@@ -8,7 +8,7 @@
     <ImageView
         android:id="@+id/genius"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="300dp"
         android:padding="20dp"
         android:src="@drawable/genius" />
 
