@@ -15,6 +15,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothSocket mSocket;
     private InputStream mInStream;
     private OutputStream mOutStream;
+    private OnReceiveInputStream mListener;
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
                             .beginTransaction()
                             .replace(R.id.fragment_container, highScoreFragment)
                             .commit();
+                    mListener = highScoreFragment;
                     return true;
                 case R.id.navigation_ajustes:
                     AjustesFragment ajustesFragment = AjustesFragment.newInstance();
@@ -75,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void setDevice(BluetoothDevice device) {
         mDevice = device;
+        connectThread();
     }
 
     public BluetoothAdapter initBluetooth(Fragment fragment) {
@@ -91,8 +95,10 @@ public class MainActivity extends AppCompatActivity {
         return mBluetoothAdapter;
     }
 
-    public void sendBluetooothSerial(String identifier) {
-        connectThread();
+    public void sendBluetooothSerial(String text) {
+        if (mSocket.isConnected()) {
+            write(text.getBytes(Charset.forName("UTF-8")));
+        }
     }
 
     public void connectThread() {
@@ -105,10 +111,15 @@ public class MainActivity extends AppCompatActivity {
                     .replace(R.id.fragment_container, ajustesFragment)
                     .commit();
         }
+
         try {
             // MY_UUID is the app's UUID string, also used by the server code
             mSocket = mDevice.createRfcommSocketToServiceRecord(Constants.GENIUS_UUID);
-        } catch (IOException e) { }
+            connectSocket();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Não foi possível conectar ao dispositivo", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void connectSocket() {
@@ -117,10 +128,10 @@ public class MainActivity extends AppCompatActivity {
             // until it succeeds or throws an exception
             mSocket.connect();
         } catch (IOException connectException) {
+            connectException.printStackTrace();
+            Toast.makeText(this, "Não foi possível iniciar a conexao com o dispositivo", Toast.LENGTH_SHORT).show();
             // Unable to connect; close the socket and get out
-            try {
-                mSocket.close();
-            } catch (IOException closeException) { }
+            closeSocket();
             return;
         }
     }
@@ -128,7 +139,10 @@ public class MainActivity extends AppCompatActivity {
     public void closeSocket() {
         try {
             mSocket.close();
-        } catch (IOException e) { }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Não foi possível fechar a conexao com o dispositivo", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void listen() {
@@ -141,10 +155,10 @@ public class MainActivity extends AppCompatActivity {
                 // Read from the InputStream
                 bytes = mInStream.read(buffer);
                 // Send the obtained bytes to the UI activity
-                //TODO: setup handler to read received messages
-//                mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
-//                        .sendToTarget();
+                mListener.inputReceived(buffer);
             } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Não foi possível receber mensagem do dispositivo", Toast.LENGTH_SHORT).show();
                 break;
             }
         }
@@ -154,6 +168,13 @@ public class MainActivity extends AppCompatActivity {
     public void write(byte[] bytes) {
         try {
             mOutStream.write(bytes);
-        } catch (IOException e) { }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Não foi possível enviar mensagem ao dispositivo", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public interface OnReceiveInputStream {
+        void inputReceived(byte[] bytes);
     }
 }

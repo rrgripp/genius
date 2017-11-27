@@ -2,13 +2,11 @@ package unicamp.ruiter.genius;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +15,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.Set;
 
 
@@ -122,22 +119,5 @@ public class AjustesFragment extends Fragment {
         }
 
         mDevicesList.setAdapter(mArrayAdapter);
-    }
-
-    public BluetoothSocket connectToDevice() {
-        BluetoothSocket tmp;
-
-        // Get a BluetoothSocket for a connection with the
-        // given BluetoothDevice
-        try {
-            tmp = mDevice.createRfcommSocketToServiceRecord(Constants.GENIUS_UUID);
-//            Method m = mDevice.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
-//            tmp = (BluetoothSocket) m.invoke(mDevice, 1);
-            return tmp;
-        } catch (IOException e) {
-            Log.e(Constants.TAG, "create() failed", e);
-        }
-
-        return null;
     }
 }

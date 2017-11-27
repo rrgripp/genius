@@ -6,14 +6,16 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 
 /**
  * Created by Ruiter on 26/11/2017.
  */
 
-public class HighScoreFragment extends Fragment {
+public class HighScoreFragment extends Fragment implements MainActivity.OnReceiveInputStream{
 
     private MainActivity mActivity;
+    private ArrayAdapter<String> mArrayAdapter;
 
     public HighScoreFragment() {
         // Required empty public constructor
@@ -59,4 +61,12 @@ public class HighScoreFragment extends Fragment {
         super.onDetach();
     }
 
+    @Override
+    public void inputReceived(byte[] bytes) {
+        String[] buffer = bytes.toString().split("&");
+        for (String s : buffer) {
+            String[] result = s.split("\\|");
+            mArrayAdapter.add(result[0] + "\n" + result[1]);
+        }
+    }
 }
