@@ -46,12 +46,7 @@ public class HighScoreFragment extends Fragment implements MainActivity.OnReceiv
     @Override
     public void onResume() {
         super.onResume();
-
-        new ScoreInputListener().doInBackground(null);
-//        Log.d(Constants.TAG, "Entered Score listener thread");
-//        String buffer = mActivity.listen();
-//        parseInput(buffer);
-//        Log.d(Constants.TAG, "Score listener thread receiverd\n" + buffer);
+        new ScoreInputListener().execute();
     }
 
     @Override
@@ -70,7 +65,10 @@ public class HighScoreFragment extends Fragment implements MainActivity.OnReceiv
 
     }
 
-
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -88,27 +86,29 @@ public class HighScoreFragment extends Fragment implements MainActivity.OnReceiv
         super.onDetach();
     }
 
-    public class ScoreInputListener extends AsyncTask {
+    public class ScoreInputListener extends AsyncTask<Void,Void,String> {
         @Override
-        protected Object doInBackground(Object[] objects) {
-            mActivity.listen();
-            return null;
+        protected String doInBackground(Void... voids) {
+            String bytes = mActivity.listen();
+            return bytes;
         }
 
         @Override
-        protected void onPostExecute(Object o) {
+        protected void onPostExecute(String o) {
             super.onPostExecute(o);
-            mScoresList.setAdapter(mArrayAdapter);
+            if (o != null) {
+                inputReceived(o);
+            }
         }
-
-
     }
 
     public void inputReceived(final String bytes) {
-        String[] buffer = bytes.split("&");
+        String[] buffer = bytes.substring(0, bytes.length() - 1).split("&");
         for (String s : buffer) {
             String[] result = s.split("\\|");
-            mArrayAdapter.add(result[0] + "\n" + result[1]);
+            mArrayAdapter.add("Nome: " + result[0] + "\n" + "Pontuação: " + result[1]);
         }
+
+        mScoresList.setAdapter(mArrayAdapter);
     }
 }

@@ -140,6 +140,9 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(this, "Não foi possível conectar ao dispositivo", Toast.LENGTH_SHORT).show();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "É preciso conectar ao dispositivo Bluetooth primeiro em Ajustes", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -164,6 +167,9 @@ public class MainActivity extends AppCompatActivity {
             // Unable to connect; close the socket and get out
             closeSocket();
             return;
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "É preciso conectar ao dispositivo Bluetooth primeiro em Ajustes", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -189,22 +195,26 @@ public class MainActivity extends AppCompatActivity {
                 bytes = mInStream.read(buffer);
                 // Send the obtained bytes to the UI activity
                 Log.d(Constants.TAG, new String(buffer).substring(0, bytes));
+
+                for (int i = 0; i < bytes; i++) {
+                    finalBuffer[bufferPointer + i] = buffer[i];
+                }
+                bufferPointer += bytes;
+
                 if (new String(buffer).contains("%")) {
-                    mListener.inputReceived(new String(finalBuffer).substring(0, bufferPointer));
-                } else {
-                    for (int i = 0; i < bytes; i++) {
-                        finalBuffer[bufferPointer + i] = buffer[i];
-                    }
-                    bufferPointer += bytes;
+                    Log.d(Constants.TAG, new String(finalBuffer).substring(0, bufferPointer));
+                    return new String(finalBuffer).substring(0, bufferPointer);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                Toast.makeText(this, "Não foi possível receber mensagem do dispositivo", Toast.LENGTH_SHORT).show();
+                break;
+            } catch (NullPointerException e) {
+                e.printStackTrace();
                 break;
             }
         }
 
-        return new String(buffer);
+        return null;
     }
 
     /* Call this from the main activity to send data to the remote device */
@@ -214,6 +224,9 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(this, "Não foi possível enviar mensagem ao dispositivo", Toast.LENGTH_SHORT).show();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "É preciso conectar ao dispositivo Bluetooth primeiro em Ajustes", Toast.LENGTH_SHORT).show();
         }
     }
 
