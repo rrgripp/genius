@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void sendBluetooothSerial(String text) {
-        if (isSocketConnected()) {
+            if (isSocketConnected()) {
             write(text.getBytes(Charset.forName("UTF-8")));
         }
     }
@@ -217,6 +217,31 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
+    public String listenJogo() {
+        byte[] buffer = new byte[1024];  // buffer store for the stream
+        int bytes; // bytes returned from read()
+
+        // Keep listening to the InputStream until an exception occurs
+        while (true) {
+            try {
+                // Read from the InputStream
+                bytes = mInStream.read(buffer);
+                // Send the obtained bytes to the UI activity
+                Log.d(Constants.TAG, new String(buffer).substring(0, bytes));
+
+                return new String(buffer).substring(0, 1);
+            } catch (IOException e) {
+                e.printStackTrace();
+                break;
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+                break;
+            }
+        }
+
+        return null;
+    }
+
     /* Call this from the main activity to send data to the remote device */
     public void write(byte[] bytes) {
         try {
@@ -228,6 +253,10 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
             Toast.makeText(this, "É preciso conectar ao dispositivo Bluetooth primeiro em Ajustes", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void selectHomeView() {
+        mNavigationView.setSelectedItemId(R.id.navigation_home);
     }
 
     public interface OnReceiveInputStream {

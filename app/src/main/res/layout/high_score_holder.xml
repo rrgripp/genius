@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/high_score_edit_text"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_margin="20dp"
+        android:lines="1"
+        android:maxLines="1"
+        android:textSize="16sp"
+        android:hint="@string/hint_high_score" />
+
+</android.support.constraint.ConstraintLayout>

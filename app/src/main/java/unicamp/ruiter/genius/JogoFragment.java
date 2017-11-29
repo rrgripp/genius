@@ -7,8 +7,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -96,38 +94,7 @@ public class JogoFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
-
-        AsyncTask.execute(new Runnable() {
-            String buffer;
-
-            @Override
-            public void run() {
-                Log.d(Constants.TAG, "Entered Jogo listener thread");
-                buffer = mActivity.listen();
-
-
-                Log.d(Constants.TAG, "Jogo listener thread receiverd\n" + buffer);
-
-                if (buffer.equals("n")) {
-                    final EditText nomeField = new EditText(getContext());
-                    nomeField.setInputType(InputType.TYPE_CLASS_TEXT);
-
-                    new AlertDialog.Builder(getContext())
-                            .setTitle("Perdeu =(")
-                            .setMessage("Gostaria de salvar o resultado?")
-                            .setView(nomeField)
-                            .setPositiveButton("Salvar", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    mActivity.sendBluetooothSerial(nomeField.getText().toString() + "\r");
-                                }
-                            })
-                            .setNegativeButton("Cancelar", null)
-                            .create().show();
-                }
-            }
-        });
+        new JogoInputListener().execute();
     }
 
     @Override
@@ -144,5 +111,69 @@ public class JogoFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+    }
+
+    public class JogoInputListener extends AsyncTask<Void,Void,String> {
+        @Override
+        protected String doInBackground(Void... voids) {
+            String bytes = mActivity.listenJogo();
+            return bytes;
+        }
+
+        @Override
+        protected void onPostExecute(String o) {
+            super.onPostExecute(o);
+                if (o != null && o.equals("n")) {
+//                    View view = getLayoutInflater().inflate(R.layout.high_score_holder, null);
+//                    final String name = new String();
+//                    EditText nomeField = view.findViewById(R.id.high_score_edit_text);
+//                    nomeField.addTextChangedListener(new TextWatcher() {
+//                        @Override
+//                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+//
+//                        }
+//
+//                        @Override
+//                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+//                            name.concat(charSequence.toString());
+//                        }
+//
+//                        @Override
+//                        public void afterTextChanged(Editable editable) {
+//                            name.concat(editable.toString());
+//
+//                        }
+//                    });
+//                final EditText nomeField = new EditText(getContext());
+//                nomeField.setHeight(60);
+//                nomeField.setWidth(160);
+//                nomeField.setPadding(20,20,20,20);
+//                nomeField.setSingleLine();
+//                nomeField.setCursorVisible(true);
+//                nomeField.setInputType(InputType.TYPE_CLASS_TEXT);
+//                nomeField.setVisibility(View.VISIBLE);
+//                nomeField.setHint(R.string.hint_high_score);
+
+                new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Light_Dialog_Alert)
+                        .setTitle("Perdeu =(")
+                        .setMessage("Gostaria de salvar o resultado?")
+                        .setView(R.layout.high_score_holder)
+                        .setPositiveButton("Salvar", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                EditText nomeField = getParentFragment().getView().findViewById(R.id.high_score_edit_text);
+                                nomeField.clearFocus();
+                                mActivity.sendBluetooothSerial(nomeField.getText().toString() + "\r");
+                            }
+                        })
+                        .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                mActivity.selectHomeView();
+                            }
+                        })
+                        .create().show();
+            }
+        }
     }
 }
