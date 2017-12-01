@@ -94,7 +94,6 @@ public class JogoFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        new JogoInputListener().execute();
     }
 
     @Override
@@ -106,6 +105,7 @@ public class JogoFragment extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+        new JogoInputListener().execute();
     }
 
     @Override
@@ -153,17 +153,19 @@ public class JogoFragment extends Fragment {
 //                nomeField.setInputType(InputType.TYPE_CLASS_TEXT);
 //                nomeField.setVisibility(View.VISIBLE);
 //                nomeField.setHint(R.string.hint_high_score);
+                final View view = getLayoutInflater().inflate(R.layout.high_score_holder, null);
 
                 new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Light_Dialog_Alert)
                         .setTitle("Perdeu =(")
                         .setMessage("Gostaria de salvar o resultado?")
-                        .setView(R.layout.high_score_holder)
+                        .setView(view)
                         .setPositiveButton("Salvar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                EditText nomeField = getParentFragment().getView().findViewById(R.id.high_score_edit_text);
+                                EditText nomeField = view.findViewById(R.id.high_score_edit_text);
                                 nomeField.clearFocus();
-                                mActivity.sendBluetooothSerial(nomeField.getText().toString() + "\r");
+                                mActivity.sendBluetooothSerial("G" + nomeField.getText().toString() + "\r");
+                                mActivity.selectScoreView();
                             }
                         })
                         .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {

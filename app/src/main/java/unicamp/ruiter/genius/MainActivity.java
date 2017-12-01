@@ -258,6 +258,9 @@ public class MainActivity extends AppCompatActivity {
     public void selectHomeView() {
         mNavigationView.setSelectedItemId(R.id.navigation_home);
     }
+    public void selectScoreView() {
+        mNavigationView.setSelectedItemId(R.id.navigation_high_score);
+    }
 
     public interface OnReceiveInputStream {
         void inputReceived(String bytes);
