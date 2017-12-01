@@ -124,35 +124,6 @@ public class JogoFragment extends Fragment {
         protected void onPostExecute(String o) {
             super.onPostExecute(o);
                 if (o != null && o.equals("n")) {
-//                    View view = getLayoutInflater().inflate(R.layout.high_score_holder, null);
-//                    final String name = new String();
-//                    EditText nomeField = view.findViewById(R.id.high_score_edit_text);
-//                    nomeField.addTextChangedListener(new TextWatcher() {
-//                        @Override
-//                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//
-//                        }
-//
-//                        @Override
-//                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//                            name.concat(charSequence.toString());
-//                        }
-//
-//                        @Override
-//                        public void afterTextChanged(Editable editable) {
-//                            name.concat(editable.toString());
-//
-//                        }
-//                    });
-//                final EditText nomeField = new EditText(getContext());
-//                nomeField.setHeight(60);
-//                nomeField.setWidth(160);
-//                nomeField.setPadding(20,20,20,20);
-//                nomeField.setSingleLine();
-//                nomeField.setCursorVisible(true);
-//                nomeField.setInputType(InputType.TYPE_CLASS_TEXT);
-//                nomeField.setVisibility(View.VISIBLE);
-//                nomeField.setHint(R.string.hint_high_score);
                 final View view = getLayoutInflater().inflate(R.layout.high_score_holder, null);
 
                 new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Light_Dialog_Alert)

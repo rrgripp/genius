@@ -11,7 +11,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -134,7 +133,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         try {
-            // MY_UUID is the app's UUID string, also used by the server code
             mSocket = mDevice.createRfcommSocketToServiceRecord(Constants.GENIUS_UUID);
             connectSocket();
         } catch (IOException e) {
@@ -194,15 +192,12 @@ public class MainActivity extends AppCompatActivity {
                 // Read from the InputStream
                 bytes = mInStream.read(buffer);
                 // Send the obtained bytes to the UI activity
-                Log.d(Constants.TAG, new String(buffer).substring(0, bytes));
-
                 for (int i = 0; i < bytes; i++) {
                     finalBuffer[bufferPointer + i] = buffer[i];
                 }
                 bufferPointer += bytes;
 
                 if (new String(buffer).contains("%")) {
-                    Log.d(Constants.TAG, new String(finalBuffer).substring(0, bufferPointer));
                     return new String(finalBuffer).substring(0, bufferPointer);
                 }
             } catch (IOException e) {
@@ -227,8 +222,6 @@ public class MainActivity extends AppCompatActivity {
                 // Read from the InputStream
                 bytes = mInStream.read(buffer);
                 // Send the obtained bytes to the UI activity
-                Log.d(Constants.TAG, new String(buffer).substring(0, bytes));
-
                 return new String(buffer).substring(0, 1);
             } catch (IOException e) {
                 e.printStackTrace();
