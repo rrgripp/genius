@@ -11,6 +11,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+
+import unicamp.ruiter.genius.to.HighScoreTO;
+
 /**
  * Created by Ruiter on 26/11/2017.
  */
@@ -104,9 +110,27 @@ public class HighScoreFragment extends Fragment implements MainActivity.OnReceiv
 
     public void inputReceived(final String bytes) {
         String[] buffer = bytes.substring(0, bytes.length() - 1).split("&");
+        ArrayList<HighScoreTO> listScores = new ArrayList<>();
         for (String s : buffer) {
             String[] result = s.split("\\|");
-            mArrayAdapter.add("Nome: " + result[0] + "\n" + "Pontuação: " + result[1]);
+            try {
+                listScores.add(new HighScoreTO(result[0], Integer.valueOf(result[1])));
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
+
+        HighScoreTO[] l = new HighScoreTO[listScores.size()];
+        listScores.toArray(l);
+        Arrays.sort(l, new Comparator<HighScoreTO>() {
+            @Override
+            public int compare(HighScoreTO h1, HighScoreTO h2) {
+                return h2.getScore() - h1.getScore();
+            }
+        });
+
+        for (HighScoreTO h : l) {
+            mArrayAdapter.add("Nome: " + h.getName() + "\n" + "Pontuação: " + String.valueOf(h.getScore()));
         }
 
         mScoresList.setAdapter(mArrayAdapter);
